@@ -10,6 +10,8 @@ Run `yarn` and `yarn dev` in both the frontend and backends.
 
 Run `yarn` and `yarn build` in both the frontend and backends. Then, copy frontend/dist to backend/dist/web. Finally, run `node dist/` to start the web app.
 
+To build the docker image, simply run `docker build -t pftracker` and watch the magic happen.
+
 ## Contribution
 
 Contributions are welcome! Either make an issue or open a pull request and it'll be reviewed promptly (hopefully).
