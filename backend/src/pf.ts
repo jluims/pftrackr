@@ -13,7 +13,6 @@ class PlanetFitness {
   }
 
   static async getGyms(zipCode: number) {
-    console.log('ZIP:', zipCode);
     const res = await this.makeRequest(
       'https://www.planetfitness.com/gyms/?q=' +
         zipCode +
@@ -69,7 +68,7 @@ class PlanetFitness {
     const json: CapacityResult = await res.json();
 
     if (json.errors.length > 0) {
-      console.log(JSON.stringify(json.errors));
+      console.log('PF err:', JSON.stringify(json.errors));
       throw new Error(
         'Planet fitness error(s): ' + json.errors.map(e => e.code).join(',')
       );
