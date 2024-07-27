@@ -27,7 +27,6 @@ apiRouter.get('/gyms/:zipCode', zipCodeMiddleware, (req, res) => {
 
   PlanetFitness.getGyms(zipCode)
     .then(gyms => {
-      //   console.log(gyms);
       res.json({ gyms });
     })
     .catch(err => {
@@ -41,7 +40,6 @@ apiRouter.get('/gyms/:zipCode', zipCodeMiddleware, (req, res) => {
 apiRouter.get('/capacity/:id', (req, res) => {
   PlanetFitness.getCapacity(req.params.id)
     .then(capacities => {
-      //   console.log(gyms);
       res.json({ capacities });
     })
     .catch(err => {

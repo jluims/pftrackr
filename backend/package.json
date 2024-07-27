@@ -4,8 +4,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "tsx src/index.ts",
-    "dev": "tsx watch src/index.ts"
+    "start": "NODE_ENV=development tsx src/index.ts",
+    "dev": "NODE_ENV=development tsx watch src/index.ts"
   },
   "license": "MIT",
   "type": "module",

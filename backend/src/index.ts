@@ -1,7 +1,6 @@
 import tls from 'tls';
 import express from 'express';
 import { apiRouter } from './api.js';
-import 'dotenv/config';
 import { appUrl, isDev } from './env.js';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -24,7 +23,9 @@ app.use('/api/', apiRouter);
 
 if (!isDev) {
   app.use(express.static(path.join(__dirname, 'web/')));
-  app.get('*', (req, res) => res.sendFile(path.resolve(__dirname, 'web', 'index.html')))
+  app.get('*', (req, res) =>
+    res.sendFile(path.resolve(__dirname, 'web', 'index.html'))
+  );
   // app.use(express.static(path.join(__dirname, 'web/')));
 }
 
@@ -35,7 +36,5 @@ app.use((req, res, next) => {
 app.listen(4000, () => {
   console.log('Listening on port 4000');
 });
-
-// console.log();
 
 export {};
