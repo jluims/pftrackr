@@ -1,0 +1,37 @@
+/* .content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px;
+  font-family: "Lato", sans-serif;
+} */
+
+.list {
+  display: block;
+  width: 300px;
+  height: 500px;
+  border: 1px solid rgb(163, 163, 163);
+  border-radius: 3px;
+  -webkit-box-shadow: 1px 1px 8px 1px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 1px 1px 8px 1px rgba(0, 0, 0, 0.15);
+  box-shadow: 1px 1px 8px 1px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.gym {
+  display: block;
+  /* border-bottom: 1px solid grey; */
+  background-color: rgb(237, 237, 237);
+  text-align: center;
+  padding: 10px 10px;
+  border: none;
+}
+
+.gym p {
+  margin: 0;
+}
+
+.gym:hover {
+  cursor: pointer;
+  background-color: rgb(228, 228, 228);
+}
