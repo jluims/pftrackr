@@ -4,7 +4,7 @@ WORKDIR /app/frontend
 
 COPY frontend/package.json frontend/yarn.lock .
 
-RUN yarn install --prod=false
+RUN yarn install --prod=false && yarn cache clean
 RUN ls
 
 COPY frontend .
@@ -16,7 +16,7 @@ WORKDIR /app/backend
 
 COPY backend/package.json backend/yarn.lock .
 
-RUN yarn install --prod=false
+RUN yarn install --prod=false && yarn cache clean
 
 COPY backend .
 
@@ -35,7 +35,7 @@ COPY --from=backend /app/backend/dist ./dist
 
 COPY backend/package.json backend/yarn.lock .
 
-RUN yarn install --prod=false
+RUN yarn install --prod=true && yarn cache clean
 
 EXPOSE 4000
 
