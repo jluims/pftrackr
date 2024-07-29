@@ -15,8 +15,16 @@
   font-size: 18px;
 }
 
-.content button {
+.searchBtn {
   width: 100%;
   height: 30px;
   margin: 10px 0;
+}
+
+.input {
+  width: 100%;
+  /* height: 50px; */
+  padding: 5px 0 5px 10px;
+  box-sizing: border-box;
+  margin-top: 5px;
 }

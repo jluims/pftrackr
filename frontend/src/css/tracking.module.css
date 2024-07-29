@@ -1,6 +1,9 @@
 .chartWrapper {
-  width: 50vw;
-  height: 50vw;
+  width: 80vw;
+  /* height: 50vw; */
+  min-width: 350px;
+  max-width: 1000px;
+  /* min-height: 300px; */
 }
 
 .dayWrapper {
@@ -8,7 +11,8 @@
   align-items: center;
   height: fit-content;
   gap: 15px;
-  margin: 5px 0 0 0;
+  margin: 0 0 5px 0;
+  /* margin: 5px 0 0 0; */
 }
 
 .content {

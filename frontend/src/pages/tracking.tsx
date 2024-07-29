@@ -239,7 +239,6 @@ function TrackingPage() {
         </div>
       )}
       <button
-        className={styles.overlayMode}
         onClick={() => setOverlayMode(!overlayMode)}
       >
         Overlay mode {overlayMode ? "on" : "off"}
