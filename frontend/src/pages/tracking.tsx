@@ -10,10 +10,11 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { CapacityData } from "../types/capacity";
 import { API } from "../api/API";
+import { Modal } from "../components/modal";
 
 ChartJS.register(
   CategoryScale,
@@ -35,6 +36,16 @@ const dayNames = [
   "Saturday",
 ];
 
+const dayColors = [
+  "rgb(255, 99, 132)",
+  "rgb(245, 99, 255)",
+  "rgb(159, 99, 255)",
+  "rgb(99, 115, 255)",
+  "rgb(99, 198, 255)",
+  "rgb(99, 255, 148)",
+  "rgb(206, 255, 99)",
+];
+
 const dayToStr = (num: number) => dayNames[num];
 
 const convertTime = (time: number) =>
@@ -47,6 +58,9 @@ function TrackingPage() {
   const [day, setDay] = useState(dayToStr(new Date().getDay()));
   const [times, setTimes] = useState<number[]>([]);
   const [visits, setVisits] = useState<number[]>([]);
+  const [overlayMode, setOverlayMode] = useState(false);
+  const [errorVisible, setErrorVisible] = useState(false);
+  const [errorContent, setErrorContent] = useState("");
   const gymId = state.gymId as string;
 
   function getBestTime() {
@@ -83,24 +97,112 @@ function TrackingPage() {
     setDay(dayToStr(dayIndex));
   }
 
-  function updateDataPoints() {
-    if (!capacities) return;
-    const histories = capacities.crowdHistory;
-    const newTimes: number[] = [];
-    const newVisits: number[] = [];
+  const getDayData = useCallback(
+    (day: string) => {
+      if (!capacities) return null;
+      const newTimes: number[] = [];
+      const newVisits: number[] = [];
 
-    for (const history of histories) {
-      if (history.weekDay === day) {
-        newTimes.push(history.hourOfDay);
-        newVisits.push(history.visits);
+      const histories = capacities.crowdHistory;
+      for (const history of histories) {
+        if (history.weekDay === day) {
+          newTimes.push(history.hourOfDay);
+          newVisits.push(history.visits);
+        }
       }
-    }
+
+      return { newTimes, newVisits };
+    },
+    [capacities]
+  );
+
+  function updateDataPoints() {
+    // if (!capacities) return;
+    // const histories = capacities.crowdHistory;
+    const dayData = getDayData(day);
+    if (!dayData) return;
+
+    const { newTimes, newVisits } = dayData;
+    // const newTimes: number[] = [];
+    // const newVisits: number[] = [];
+
+    // for (const history of histories) {
+    //   if (history.weekDay === day) {
+    //     newTimes.push(history.hourOfDay);
+    //     newVisits.push(history.visits);
+    //   }
+    // }
 
     setTimes(newTimes);
     setVisits(newVisits);
   }
 
-  useEffect(updateDataPoints, [day, capacities]);
+  useEffect(updateDataPoints, [day, capacities, getDayData]);
+
+  function getData() {
+    const datasets: {
+      label: string;
+      data: number[];
+      borderColor: string;
+      backgroundColor: string;
+      yAxisID: string;
+    }[] = [];
+
+    if (overlayMode) {
+      let i = 0;
+      for (const day of dayNames) {
+        const dayData = getDayData(day);
+        if (dayData) {
+          const { newVisits } = dayData;
+          datasets.push({
+            label: day,
+            data: newVisits,
+            borderColor: dayColors[i],
+            backgroundColor: dayColors[i],
+            yAxisID: "y",
+          });
+        }
+        i++;
+      }
+
+      // return {};
+    } else {
+      const i = dayNames.indexOf(day);
+      datasets.push({
+        label: "Gym occupancy",
+        data: visits,
+        borderColor: dayColors[i],
+        backgroundColor: dayColors[i],
+        yAxisID: "y",
+      });
+      // return {
+      //   labels: times.map((n) => convertTime(n)),
+      //   datasets: [
+      //     {
+      //       label: "Gym occupancy",
+      //       data: visits,
+      //       borderColor: "rgb(255, 99, 132)",
+      //       backgroundColor: "rgba(255, 99, 132, 0.5)",
+      //       yAxisID: "y",
+      //     },
+      //   ],
+      // };
+    }
+
+    return {
+      labels: times.map((n) => convertTime(n)),
+      datasets,
+      // [
+      //   {
+      //     label: "Gym occupancy",
+      //     data: visits,
+      //     borderColor: "rgb(255, 99, 132)",
+      //     backgroundColor: "rgba(255, 99, 132, 0.5)",
+      //     yAxisID: "y",
+      //   },
+      // ],
+    };
+  }
 
   useEffect(() => {
     if (!gymId) return;
@@ -110,7 +212,8 @@ function TrackingPage() {
         setCapacities(res);
       })
       .catch((err) => {
-        alert("Error: " + String(err));
+        setErrorContent(String(err));
+        setErrorVisible(true);
       });
   }, [gymId]);
 
@@ -124,16 +227,28 @@ function TrackingPage() {
       <h1>Gym tracking</h1>
       <p>Max occupancy: {capacities?.maxCapacity}</p>
       <p>The best time to go is {convertTime(getBestTime())}</p>
-      <div className={styles.dayWrapper}>
-        <button onClick={prevDay}>&lt;</button>
-        <p>{day}</p>
-
-        <button onClick={nextDay}>&gt;</button>
-      </div>
+      <p>
+        Note: This data is from Planet Fitness itself, it may not be completely
+        accurate.
+      </p>
+      {!overlayMode && (
+        <div className={styles.dayWrapper}>
+          <button onClick={prevDay}>&lt;</button>
+          <p>{day}</p>
+          <button onClick={nextDay}>&gt;</button>
+        </div>
+      )}
+      <button
+        className={styles.overlayMode}
+        onClick={() => setOverlayMode(!overlayMode)}
+      >
+        Overlay mode {overlayMode ? "on" : "off"}
+      </button>
       <div className={styles.chartWrapper}>
         <Line
           options={{
             responsive: true,
+            maintainAspectRatio: true,
             interaction: {
               mode: "index" as const,
               intersect: false,
@@ -146,20 +261,15 @@ function TrackingPage() {
               },
             },
           }}
-          data={{
-            labels: times.map((n) => convertTime(n)),
-            datasets: [
-              {
-                label: "Gym occupancy",
-                data: visits,
-                borderColor: "rgb(255, 99, 132)",
-                backgroundColor: "rgba(255, 99, 132, 0.5)",
-                yAxisID: "y",
-              },
-            ],
-          }}
+          data={getData()}
         />
       </div>
+      <Modal
+        title="Error"
+        content={errorContent}
+        visible={errorVisible}
+        setVisible={setErrorVisible}
+      />
     </div>
   );
 }
