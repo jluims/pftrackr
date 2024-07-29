@@ -50,7 +50,7 @@ function MainPage() {
             <div>
               <p>Enter your ZIP/postal code</p>
               <input
-                type="number"
+                type="text"
                 value={zipCode}
                 onChange={(ev) => setZipCode(ev.target.value)}
                 placeholder="e.g. 12345"
