@@ -10,4 +10,6 @@ if (appUrl === undefined) {
   throw new Error('APP_URL env not set!');
 }
 
-export { isDev, appUrl };
+const useProxy = process.env.USE_PROXY === 'true';
+
+export { isDev, appUrl, useProxy };

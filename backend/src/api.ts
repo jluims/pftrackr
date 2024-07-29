@@ -1,29 +1,29 @@
 import express from 'express';
 import { PlanetFitness } from './pf.js';
+import rateLimit from 'express-rate-limit';
+import { useProxy } from './env.js';
 const apiRouter = express.Router();
 
-const zipCodeMiddleware = (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) => {
-  const zipCode = Number.parseInt(req.params.zipCode);
-  if (
-    !Number.isFinite(zipCode) ||
-    !/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(req.params.zipCode)
-  ) {
-    return res.status(400).json({
-      error: 'Invalid ZIP code'
-    });
-  }
+apiRouter.use(
+  rateLimit({
+    keyGenerator: (req, res) => {
+      if (useProxy) {
+        return req.header('X-Real-IP')?.[0] ?? req.ip ?? '';
+      } else {
+        return req.ip ?? '';
+      }
+    },
+    limit: 20,
+    windowMs: 1 * 1000 * 60,
+    handler: (_req, res) =>
+      res.status(429).json({
+        error: "You're doing this too fast! Try again in a few minutes."
+      })
+  })
+);
 
-  res.locals.zipCode = zipCode;
-
-  next();
-};
-
-apiRouter.get('/gyms/:zipCode', zipCodeMiddleware, (req, res) => {
-  let zipCode: number = res.locals.zipCode;
+apiRouter.get('/gyms/:zipCode', (req, res) => {
+  let zipCode = req.params.zipCode;
 
   PlanetFitness.getGyms(zipCode)
     .then(gyms => {

@@ -12,7 +12,7 @@ class PlanetFitness {
     return fetch(url, options);
   }
 
-  static async getGyms(zipCode: number) {
+  static async getGyms(zipCode: string) {
     const res = await this.makeRequest(
       'https://www.planetfitness.com/gyms/?q=' +
         zipCode +
